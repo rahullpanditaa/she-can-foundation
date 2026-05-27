@@ -1,9 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"encoding/json"
 	"fmt"
 	"net/http"
+
+	_ "github.com/mattn/go-sqlite3"
 )
 
 type FormData struct {
@@ -54,6 +57,27 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 	fmt.Println("Email:", form.Email)
 	fmt.Println("Message:", form.Message)
 
+	// insert form data into db
+	insertQuery := `
+	INSERT INTO submissions (name, email, message)
+	VALUES (?, ?, ?)
+	`
+	_, err = db.Exec(
+		insertQuery,
+		form.Name,
+		form.Email,
+		form.Message,
+	)
+
+	if err != nil {
+		http.Error(
+			w,
+			"Database insert failed",
+			http.StatusInternalServerError,
+		)
+		return
+	}
+
 	response := Response{
 		Success: true,
 	}
@@ -62,7 +86,31 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+// db
+var db *sql.DB
+
 func main() {
+	// initialize db
+	var err error
+	db, err = sql.Open("sqlite3", "./submissions.db")
+	if err != nil {
+		panic(err)
+	}
+
+	// create submissions table
+	createTableQuery := `
+	CREATE TABLE IF NOT EXISTS submissions (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT,
+		email TEXT,
+		message TEXT
+	);
+	`
+	_, err = db.Exec(createTableQuery)
+	if err != nil {
+		panic(err)
+	}
+
 	http.HandleFunc("/submit", submitHandler)
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", nil)
