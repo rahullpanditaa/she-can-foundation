@@ -2,7 +2,28 @@
 
 A full-stack web app built for the She Can Foundation internship assignment.
 
-Users can submit contact form responses, which are stored in a SQLite database and managed through a protected admin dashboard.
+Users can submit contact form responses through a responsive frontend interface. Submissions are stored in a SQLite database and managed through a protected admin dashboard.
+
+---
+
+# Live Demo
+
+## Frontend
+
+[Frontend](https://fancy-naiad-fc8908.netlify.app/)
+
+## Admin Dashboard
+
+[Dashboard](https://she-can-foundation-czjf.onrender.com/admin)
+
+---
+
+# Admin Credentials
+
+```text
+Username: admin1234
+Password: psswrd123
+```
 
 ---
 
@@ -10,27 +31,23 @@ Users can submit contact form responses, which are stored in a SQLite database a
 
 ## User Features
 
-* Submit form with:
-
-  * Name
-  * Email
-  * Message
+* Submit contact form
+* Responsive design
 * Form validation
-* Responsive UI
-* Success toast notifications
-* Smooth animations
+* Animated toast notifications
+* Smooth UI interactions
+* Mobile-friendly layout
 
 ---
 
 ## Admin Features
 
-* Admin authentication
-* Protected admin dashboard
+* Admin auth
 * View all submissions
 * Delete submissions
 * Export submissions as CSV
 * Timestamped submissions
-* Empty dashboard state handling
+* Secure route protection
 
 ---
 
@@ -63,19 +80,50 @@ she-can-foundation/
 │   ├── main.go
 │   ├── admin.html
 │   ├── login.html
-│   └── submissions.db
+│   ├── submissions.db
+│   ├── go.mod
+│   └── go.sum
 │
-└── README.md
+├── README.md
+└── .gitignore
 ```
 
 ---
 
-# Setup Instructions
+# API Endpoint
+
+## Submit Form
+
+```http
+POST /submit
+```
+
+### Example Request
+
+```json
+{
+  "name": "Rahul",
+  "email": "rahul@example.com",
+  "message": "Hello"
+}
+```
+
+### Example Response
+
+```json
+{
+  "success": true
+}
+```
+
+---
+
+# Local Setup Instructions
 
 ## 1. Clone Repository
 
 ```bash
-git clone YOUR_REPOSITORY_LINK
+git clone https://github.com/rahullpanditaa/she-can-foundation
 ```
 
 ---
@@ -111,7 +159,6 @@ http://localhost:8080
 ## 3. Start Frontend
 
 Open another terminal.
-
 Navigate into frontend folder:
 
 ```bash
@@ -132,45 +179,44 @@ http://localhost:8000
 
 ---
 
-# Admin Login
+# Admin Routes
 
-Visit:
+## Login Page
 
 ```text
-http://localhost:8080/login
+/backend/login
 ```
 
-Default credentials:
+## Admin Dashboard
 
 ```text
-Username: admin1234
-Password: psswrd123
+/backend/admin
+```
+
+## Export CSV
+
+```text
+/backend/export
 ```
 
 ---
 
-# API Endpoint
+# Screenshots
 
-## Submit Form
+## Homepage
 
-```http
-POST /submit
-```
+![Homepage](screenshots/homepage.png)
 
-Example request:
+---
 
-```json
-{
-  "name": "Rahul",
-  "email": "rahul@example.com",
-  "message": "Hello"
-}
-```
+## Login Page
 
-Example response:
+![Login](screenshots/login.png)
 
-```json
-{
-  "success": true
-}
-```
+---
+
+## Admin Dashboard
+
+![Dashboard](screenshots/dashboard.png)
+
+---
