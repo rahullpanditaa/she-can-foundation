@@ -55,6 +55,7 @@
                 <th>Name</th>
                 <th>Email</th>
                 <th>Message</th>
+                <th>Submitted At</th>
             </tr>
             {{range .}}
             <tr>
@@ -62,6 +63,7 @@
                 <td>{{.Name}}</td>
                 <td>{{.Email}}</td>
                 <td>{{.Message}}</td>
+                <td>{{.CreatedAt}}</td>
             </tr>
             {{end}}
         </table>

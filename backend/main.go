@@ -21,10 +21,11 @@ type Response struct {
 }
 
 type Submission struct {
-	ID      int
-	Name    string
-	Email   string
-	Message string
+	ID        int
+	Name      string
+	Email     string
+	Message   string
+	CreatedAt string
 }
 
 func enableCors(w http.ResponseWriter) {
@@ -96,7 +97,7 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
 	rows, err := db.Query(`
-		SELECT id, name, email, message
+		SELECT id, name, email, message, created_at
 		FROM submissions
 		ORDER BY id DESC
 	`)
@@ -120,6 +121,7 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 			&submission.Name,
 			&submission.Email,
 			&submission.Message,
+			&submission.CreatedAt,
 		)
 
 		if err != nil {
@@ -151,7 +153,8 @@ func main() {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT,
 		email TEXT,
-		message TEXT
+		message TEXT,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 	`
 	_, err = db.Exec(createTableQuery)
