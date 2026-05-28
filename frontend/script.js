@@ -23,7 +23,7 @@ form.addEventListener("submit", async (event) => {
     }
 
     try {
-        const response = await fetch("http://localhost:8080/submit", {
+        const response = await fetch("https://she-can-foundation-czjf.onrender.com/submit", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
