@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"html/template"
 	"net/http"
 
 	_ "github.com/mattn/go-sqlite3"
@@ -17,6 +18,13 @@ type FormData struct {
 
 type Response struct {
 	Success bool `json:"success"`
+}
+
+type Submission struct {
+	ID      int
+	Name    string
+	Email   string
+	Message string
 }
 
 func enableCors(w http.ResponseWriter) {
@@ -86,6 +94,46 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 	json.NewEncoder(w).Encode(response)
 }
 
+func adminHandler(w http.ResponseWriter, r *http.Request) {
+	rows, err := db.Query(`
+		SELECT id, name, email, message
+		FROM submissions
+		ORDER BY id DESC
+	`)
+
+	if err != nil {
+		http.Error(
+			w,
+			"Failed to fetch submissions",
+			http.StatusInternalServerError,
+		)
+		return
+	}
+	defer rows.Close()
+
+	var submissions []Submission
+	for rows.Next() {
+		var submission Submission
+
+		err := rows.Scan(
+			&submission.ID,
+			&submission.Name,
+			&submission.Email,
+			&submission.Message,
+		)
+
+		if err != nil {
+			continue
+		}
+		submissions = append(submissions, submission)
+	}
+
+	tmpl := template.Must(
+		template.ParseFiles("admin.html"),
+	)
+	tmpl.Execute(w, submissions)
+}
+
 // db
 var db *sql.DB
 
@@ -112,6 +160,7 @@ func main() {
 	}
 
 	http.HandleFunc("/submit", submitHandler)
+	http.HandleFunc("/admin", adminHandler)
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", nil)
 }
