@@ -1,6 +1,7 @@
 const form = document.getElementById("contact-form");
 const successMessage = document.getElementById("success-message");
 const submitButton = document.getElementById("submit-btn");
+const toast = document.getElementById("toast");
 
 form.addEventListener("submit", async (event) => {
     event.preventDefault();
@@ -32,7 +33,13 @@ form.addEventListener("submit", async (event) => {
 
         const data = await response.json();
         if (data.success) {
-            successMessage.innerText = "Form Submitted Successfully";
+            toast.innerText = "Form Submitted Successfully";
+            toast.classList.add("show");
+
+            setTimeout(() => {
+                toast.classList.remove("show");
+            }, 3000);
+
             form.reset();
         }
     } catch (error) {

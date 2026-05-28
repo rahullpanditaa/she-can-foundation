@@ -3,13 +3,16 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <link rel="preconnect" href="https://fonts.googleapis.com">
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
         <title>Admin Dashboard</title>
         <style>
             * {
                 margin: 0;
                 padding: 0;
                 box-sizing: border-box;
-                font-family: Arial, sans-serif;
+                font-family: "Inter", sans-serif;
             }
         
             body {
@@ -77,6 +80,23 @@
             .logout-btn:hover {
                 opacity: 0.85;
             }
+
+            .empty-state {                        
+                background-color: white;
+                padding: 60px 20px;
+                text-align: center;
+                border-radius: 16px;
+                box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            }
+
+            .empty-state h2 {
+                margin-bottom: 10px;
+                color: #222;
+            }
+
+            .empty-state p {
+                color: #666;
+            }
         </style>
     </head>
     <body>
@@ -88,7 +108,8 @@
                 <button class="logout-btn">Logout</button>
             </a>
         </div>
-    
+        
+        {{if .}}
         <table>
             <tr>
                 <th>ID</th>
@@ -106,12 +127,21 @@
                 <td>{{.Message}}</td>
                 <td>{{.CreatedAt}}</td>
                 <td>
-                    <form action="/delete?id={{.ID}}" method="POST">
+                    <form action="/delete?id={{.ID}}" method="POST" onsubmit="return confirm('Delete this submission?')">
                         <button class="delete-btn">Delete</button>
                     </form>
                 </td>
             </tr>
             {{end}}
         </table>
+
+        {{else}}
+
+        <div class="empty-state">
+            <h2>No submissions yet</h2>
+            <p>New form submissions will appear here.</p>
+        </div>
+
+        {{end}}
     </body>
 </html>

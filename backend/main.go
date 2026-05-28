@@ -2,6 +2,7 @@ package main
 
 import (
 	"database/sql"
+	"encoding/csv"
 	"encoding/json"
 	"fmt"
 	"html/template"
@@ -225,6 +226,68 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) {
 
 	http.SetCookie(w, &cookie)
 	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+func exportCSVHandler(w http.ResponseWriter, r *http.Request) {
+
+	if !isAuthenticated(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
+	rows, err := db.Query(`
+		SELECT id, name, email, message, created_at
+		FROM submissions
+		ORDER BY id DESC
+	`)
+
+	if err != nil {
+		http.Error(w, "Failed to fetch submissions", http.StatusInternalServerError)
+		return
+	}
+	defer rows.Close()
+
+	w.Header().Set(
+		"Content-Disposition",
+		"attachment; filename=submissions.csv",
+	)
+
+	w.Header().Set("Content-Type", "text/csv")
+
+	writer := csv.NewWriter(w)
+
+	defer writer.Flush()
+
+	writer.Write([]string{
+		"ID",
+		"Name",
+		"Email",
+		"Message",
+		"Created At",
+	})
+
+	for rows.Next() {
+		var submission Submission
+		err := rows.Scan(
+			&submission.ID,
+			&submission.Name,
+			&submission.Email,
+			&submission.Message,
+			&submission.CreatedAt,
+		)
+
+		if err != nil {
+			continue
+		}
+
+		writer.Write([]string{
+			fmt.Sprint(submission.ID),
+			submission.Name,
+			submission.Email,
+			submission.Message,
+			submission.CreatedAt,
+		})
+	}
 }
 
 // auth middleware
