@@ -97,6 +97,25 @@
             .empty-state p {
                 color: #666;
             }
+
+            .actions {     
+                display: flex;
+                gap: 10px;
+            }
+
+            .export-btn {
+                padding: 10px 16px;
+                border: none;
+                border-radius: 8px;
+                background-color: #2cb67d;
+                color: white;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+            .export-btn:hover {
+                opacity: 0.85;
+            }
         </style>
     </head>
     <body>
@@ -104,9 +123,15 @@
         <h1>Form Submissions</h1>
 
         <div class="top-bar">
-            <a href="/logout">
-                <button class="logout-btn">Logout</button>
-            </a>
+            <div class="actions">
+                <a href="/export">
+                    <button class="export-btn">Export CSV</button>
+                </a>
+            
+                <a href="/logout">
+                    <button class="logout-btn">Logout</button>
+                </a>
+            </div>
         </div>
         
         {{if .}}
