@@ -43,6 +43,20 @@
             tr:hover {
                 background-color: #f0f0f0;
             }
+
+            .delete-btn {
+                padding: 8px 14px;
+                border: none;
+                border-radius: 8px;
+                background-color: #e63946;
+                color: white;
+                cursor: pointer;
+                transition: 0.3s;
+            }
+
+            .delete-btn:hover {
+                opacity: 0.85;
+            }
         </style>
     </head>
     <body>
@@ -56,6 +70,7 @@
                 <th>Email</th>
                 <th>Message</th>
                 <th>Submitted At</th>
+                <th>Action</th>
             </tr>
             {{range .}}
             <tr>
@@ -64,6 +79,11 @@
                 <td>{{.Email}}</td>
                 <td>{{.Message}}</td>
                 <td>{{.CreatedAt}}</td>
+                <td>
+                    <form action="/delete?id={{.ID}}" method="POST">
+                        <button class="delete-btn">Delete</button>
+                    </form>
+                </td>
             </tr>
             {{end}}
         </table>
