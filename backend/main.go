@@ -10,6 +10,10 @@ import (
 	_ "github.com/mattn/go-sqlite3"
 )
 
+// hardcoded for now
+const ADMIN_USERNAME = "admin1234"
+const ADMIN_PASSWORD = "psswrd123"
+
 type FormData struct {
 	Name    string `json:"name"`
 	Email   string `json:"email"`
@@ -96,6 +100,13 @@ func submitHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func adminHandler(w http.ResponseWriter, r *http.Request) {
+
+	// use auth middleware to protect admin dashboard
+	if !isAuthenticated(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
 	rows, err := db.Query(`
 		SELECT id, name, email, message, created_at
 		FROM submissions
@@ -137,6 +148,13 @@ func adminHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func deleteHandler(w http.ResponseWriter, r *http.Request) {
+
+	// protect route
+	if !isAuthenticated(r) {
+		http.Redirect(w, r, "/login", http.StatusSeeOther)
+		return
+	}
+
 	if r.Method != http.MethodPost {
 		http.Error(
 			w,
@@ -169,6 +187,55 @@ func deleteHandler(w http.ResponseWriter, r *http.Request) {
 	)
 }
 
+func loginHandler(w http.ResponseWriter, r *http.Request) {
+	if r.Method == http.MethodGet {
+		tmpl := template.Must(
+			template.ParseFiles("login.html"),
+		)
+		tmpl.Execute(w, nil)
+		return
+	}
+
+	username := r.FormValue("username")
+	password := r.FormValue("password")
+
+	if username == ADMIN_USERNAME &&
+		password == ADMIN_PASSWORD {
+		cookie := http.Cookie{
+			Name:  "authenticated",
+			Value: "true",
+			Path:  "/",
+		}
+
+		http.SetCookie(w, &cookie)
+		http.Redirect(w, r, "/admin", http.StatusSeeOther)
+		return
+	}
+	tmpl := template.Must(template.ParseFiles("login.html"))
+	tmpl.Execute(w, "Invalid username or password")
+}
+
+func logoutHandler(w http.ResponseWriter, r *http.Request) {
+	cookie := http.Cookie{
+		Name:   "authenticated",
+		Value:  "",
+		Path:   "/",
+		MaxAge: -1,
+	}
+
+	http.SetCookie(w, &cookie)
+	http.Redirect(w, r, "/login", http.StatusSeeOther)
+}
+
+// auth middleware
+func isAuthenticated(r *http.Request) bool {
+	cookie, err := r.Cookie("authenticated")
+	if err != nil {
+		return false
+	}
+	return cookie.Value == "true"
+}
+
 // db
 var db *sql.DB
 
@@ -198,6 +265,8 @@ func main() {
 	http.HandleFunc("/submit", submitHandler)
 	http.HandleFunc("/admin", adminHandler)
 	http.HandleFunc("/delete", deleteHandler)
+	http.HandleFunc("/login", loginHandler)
+	http.HandleFunc("/logout", logoutHandler)
 
 	fmt.Println("Server running on port 8080")
 	http.ListenAndServe(":8080", nil)
